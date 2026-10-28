@@ -1,0 +1,28 @@
+
+name: SimpleHomesNk
+main: com.brunojaegerk.simplehomes.SimpleHomes
+version: "1.0.0"
+api: ["1.0.13"]
+author: BrunoJaegerK
+description: Sistema de hogares para NukkitPetteriM1Edition
+depend:
+  - FormConstructor
+
+commands:
+  homes:
+    description: Abre el menú de hogares
+    usage: "/homes"
+    permission: simplehomes.command.homes
+
+permissions:
+  simplehomes.command.homes:
+    default: true
+  simplehomes.command.sethome:
+    default: true
+  simplehomes.command.home:
+    default: true
+  simplehomes.command.delhome:
+    default: true
+  simplehomes.limit.1:
+    default: true
+

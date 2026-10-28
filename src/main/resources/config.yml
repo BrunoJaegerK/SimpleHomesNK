@@ -1,0 +1,18 @@
+# Configuración de SimpleHomesNK
+
+settings:
+  # Los operadores tienen hogares ilimitados.
+  op-unlimited: true
+
+  # Límite aplicado cuando el jugador no tiene
+  # ninguno de los permisos de límite específicos.
+  default-limit: 3
+
+  teleport-delay: 3
+
+# Permisos de LuckPerms y cantidad de hogares.
+home-limits:
+  simplehomes.limit.3: 3
+  simplehomes.limit.5: 5
+  simplehomes.limit.7: 7
+  simplehomes.limit.10: 10
