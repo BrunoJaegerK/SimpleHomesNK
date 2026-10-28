@@ -3,7 +3,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Minecraft-Bedrock%20Edition-43A047?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft Bedrock Edition">
   <img src="https://img.shields.io/badge/Server-NukkitPetteriM1Edition-2196F3?style=for-the-badge" alt="NukkitPetteriM1Edition">
-  <img src="https://img.shields.io/badge/Java-Maven-orange?style=for-the-badge&logo=java&logoColor=white" alt="Java Maven">
+  <img src="https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 25">
   <img src="https://img.shields.io/badge/Database-SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
 </p>
 
@@ -19,7 +19,7 @@
 
 El objetivo es ofrecer un sistema de hogares práctico, con límites configurables según los permisos del jugador, almacenamiento persistente y un sistema de teletransporte con tiempo de espera para mejorar la experiencia de juego.
 
-El plugin utiliza **Java, Maven, SQLite y FormConstructor** para gestionar los hogares, almacenar los datos y mostrar formularios interactivos.
+El plugin utiliza Java, Maven, SQLite y FormConstructor para gestionar los hogares, almacenar los datos y mostrar formularios interactivos.
 
 ## ✨ Características principales
 
@@ -44,7 +44,7 @@ El plugin utiliza **Java, Maven, SQLite y FormConstructor** para gestionar los h
 | `/delhome <nombre>` | Elimina el hogar indicado. |
 | `/homes` | Abre el menú para consultar y administrar los hogares. |
 
-> Los comandos deben ejecutarse con los permisos correspondientes definidos en la configuración del plugin.
+> Los comandos requieren los permisos correspondientes definidos en el plugin. Consulta `plugin.yml` para comprobar sus declaraciones.
 
 ## 🖥️ Interfaz de hogares
 
@@ -111,170 +111,23 @@ home-limits:
 ### Requisitos
 
 - Un servidor compatible con **NukkitPetteriM1Edition**.
-- Java compatible con la versión del servidor y la compilación del plugin.
-- FormConstructor **3.1.0**, utilizado para los formularios interactivos.
+- **Java JDK 25** para el entorno de desarrollo y la compilación configurada del proyecto. Comprueba la compatibilidad con la versión de tu servidor antes de actualizar el Java que utiliza en producción.
+- **FormConstructor 3.1.0**, utilizado para los formularios interactivos.
 - El archivo JAR compilado de SimpleHomesNK.
+- **LuckPerms**, si deseas gestionar los límites de hogares mediante rangos y permisos.
 
-### Instalación en el servidor
+### 📥 Enlaces de descarga
 
-1. Descarga el archivo `SimpleHomesNK.jar` de la sección **Releases** del repositorio, cuando esté publicado.
-2. Copia el JAR en la carpeta `plugins` de tu servidor.
-3. Instala también la dependencia FormConstructor compatible con tu servidor.
-4. Inicia el servidor y comprueba que el plugin se cargue correctamente.
-5. Revisa la carpeta de datos del plugin y configura `config.yml` según las necesidades de tu comunidad.
-6. Prueba `/sethome`, `/home` y `/homes` dentro del servidor.
+| Componente | Versión | Enlace |
+|---|---|---|
+| NukkitPetteriM1Edition | Según tu servidor | [Repositorio oficial](https://github.com/PetteriM1/NukkitPetteriM1Edition) · [Releases](https://github.com/PetteriM1/NukkitPetteriM1Edition/releases) |
+| Java JDK | 25 | [Descargar JDK 25](https://jdk.java.net/25/) |
+| FormConstructor | 3.1.0 | [Repositorio en GitHub](https://github.com/ContentForge/FormConstructor) · [Releases](https://github.com/ContentForge/FormConstructor/releases) |
+| SQLite JDBC | 3.50.3.0 | [Descargar desde GitHub](https://github.com/xerial/sqlite-jdbc/releases/tag/3.50.3.0) |
+| LuckPerms | Versión compatible | [Repositorio oficial](https://github.com/LuckPerms/LuckPerms) |
 
-> Si todavía no hay una Release publicada, puedes compilar el proyecto siguiendo las instrucciones de desarrollo que aparecen a continuación.
+**Importante:** utiliza la versión `3.1.0` de FormConstructor. Si no aparece entre los archivos de las versiones publicadas, revisa las etiquetas y los archivos del repositorio antes de descargar otra versión.
 
-## 👨‍💻 Compilar desde el código fuente
+SQLite JDBC se integra en el JAR compilado mediante Maven. No necesitas instalar ese controlador como un plugin independiente cuando utilizas el JAR final generado correctamente.
 
-SimpleHomesNK utiliza **Maven** para gestionar las dependencias y generar el archivo JAR.
-
-### Requisitos de desarrollo
-
-- JDK compatible con la configuración del proyecto.
-- IntelliJ IDEA u otro IDE compatible con Maven.
-- Maven.
-- `server.jar` de NukkitPetteriM1Edition.
-- `FormConstructor-3.1.0.jar`.
-
-### Pasos
-
-1. Clona el repositorio:
-
-   ```bash
-   git clone https://github.com/BrunoJaegerK/SimpleHomesNK.git
-   ```
-
-2. Abre el proyecto en IntelliJ IDEA como un proyecto Maven.
-
-3. Coloca las dependencias locales en la carpeta `libs` con estos nombres:
-
-   ```text
-   libs/
-   ├── server.jar
-   └── FormConstructor-3.1.0.jar
-   ```
-
-4. Ejecuta la compilación desde la terminal, en la raíz del proyecto:
-
-   ```bash
-   mvn clean package
-   ```
-
-5. Cuando Maven finalice correctamente, busca el JAR generado en la carpeta `target`.
-
-**Importante:** las dependencias JAR locales se excluyen del repositorio para evitar subir archivos externos o pesados. Debes conseguir las versiones compatibles por separado.
-
-## 🗂️ Estructura del proyecto
-
-```text
-SimpleHomesNK/
-├── libs/
-│   ├── server.jar
-│   └── FormConstructor-3.1.0.jar
-├── src/
-│   └── main/
-│       ├── java/
-│       │   └── com/brunojaegerk/simplehomes/
-│       │       ├── SimpleHomes.java
-│       │       ├── DatabaseManager.java
-│       │       ├── HomeTeleportManager.java
-│       │       ├── commands/
-│       │       │   ├── SetHomeCommand.java
-│       │       │   ├── HomeCommand.java
-│       │       │   └── DelHomeCommand.java
-│       │       └── homes/
-│       │           ├── Home.java
-│       │           └── HomeManager.java
-│       └── resources/
-│           ├── config.yml
-│           └── plugin.yml
-├── pom.xml
-└── README.md
-```
-
-### 📚 ¿Para qué sirve cada archivo?
-
-| Archivo | Responsabilidad |
-|---|---|
-| `SimpleHomes.java` | Clase principal del plugin. Inicializa los componentes y registra los comandos y eventos necesarios. |
-| `DatabaseManager.java` | Gestiona la conexión y las operaciones de la base de datos SQLite. |
-| `HomeTeleportManager.java` | Controla la espera del teletransporte, las cancelaciones y la lógica relacionada con el destino. |
-| `Home.java` | Representa un hogar y sus datos, como nombre, mundo, coordenadas, orientación y propietario. |
-| `HomeManager.java` | Centraliza la gestión de los hogares, incluidos su registro, consulta, eliminación y renombrado. |
-| `SetHomeCommand.java` | Implementa el comando para guardar hogares. |
-| `HomeCommand.java` | Implementa el comando para visitar hogares guardados. |
-| `DelHomeCommand.java` | Implementa el comando para eliminar hogares. |
-| `config.yml` | Define los límites de hogares y el tiempo de espera del teletransporte. |
-| `plugin.yml` | Contiene los metadatos del plugin y la declaración de sus comandos y permisos. |
-| `pom.xml` | Configura Maven, las dependencias, la compilación y la generación del JAR. |
-
-## 💾 Base de datos
-
-SimpleHomesNK utiliza **SQLite** para conservar los hogares de los jugadores.
-
-Cada hogar almacena información necesaria para identificar al propietario y reconstruir su ubicación, incluyendo:
-
-- UUID y nombre del jugador.
-- Nombre del hogar.
-- Mundo donde se encuentra.
-- Coordenadas.
-- Orientación del jugador: yaw y pitch.
-- Marca de tiempo asociada al registro.
-
-Esto permite que los hogares no dependan de que el jugador permanezca conectado. Los datos se guardan en la base de datos del plugin y se mantienen después de reiniciar el servidor.
-
-La configuración de SQLite se integra en el proyecto mediante Maven y el empaquetado del controlador JDBC.
-
-## 🧰 Tecnologías utilizadas
-
-| Tecnología | Uso |
-|---|---|
-| **Java** | Lenguaje de programación del plugin. |
-| **NukkitPetteriM1Edition** | API y plataforma del servidor Minecraft Bedrock. |
-| **Maven** | Gestión de dependencias y compilación. |
-| **SQLite** | Almacenamiento persistente de los hogares. |
-| **FormConstructor 3.1.0** | Formularios personalizados para la interfaz gráfica. |
-| **LuckPerms** | Gestión de grupos y permisos para los límites de hogares. |
-| **Git y GitHub** | Control de versiones y alojamiento del código fuente. |
-
-## 🗺️ Posibles mejoras futuras
-
-Estas son ideas que podrían incorporarse en versiones posteriores:
-
-- 📍 Invitaciones para compartir hogares con otros jugadores.
-- ⭐ Hogares favoritos y orden personalizado.
-- 🌎 Restricciones configurables por mundo.
-- 🛡️ Más opciones de seguridad para los destinos.
-- 🎨 Mejoras visuales en el menú de hogares.
-- 🔔 Mensajes configurables para las acciones del plugin.
-- 🌐 Traducciones y personalización de mensajes.
-
-Estas funciones son propuestas para el futuro y no deben considerarse implementadas en la versión actual.
-
-## 🐛 Reportes y sugerencias
-
-¿Encontraste un error o tienes una idea para mejorar SimpleHomesNK?
-
-- **Código fuente:** [GitHub — SimpleHomesNK](https://github.com/BrunoJaegerK/SimpleHomesNK)
-- **Reportar errores:** utiliza la sección [Issues](https://github.com/BrunoJaegerK/SimpleHomesNK/issues).
-- **Proponer mejoras:** puedes abrir una discusión o crear una solicitud de mejora en GitHub, si esas funciones están habilitadas en el repositorio.
-
-Al reportar un error, incluye la versión del servidor, la versión del plugin, los pasos para reproducirlo y los mensajes relevantes de la consola.
-
-## 📜 Licencia
-
-Consulta la licencia publicada en el repositorio para conocer las condiciones de uso, modificación y distribución del proyecto.
-
-Si el repositorio todavía no contiene un archivo de licencia, no se debe asumir que el proyecto está publicado bajo una licencia de código abierto específica.
-
----
-
-<p align="center">
-  Desarrollado con ❤️ para la comunidad de Minecraft Bedrock.
-</p>
-
-<p align="center">
-  <b>SimpleHomesNK</b> — Hogares fáciles de crear, administrar y visitar.
-</p>
+###
