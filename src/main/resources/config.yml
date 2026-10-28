@@ -4,11 +4,24 @@ settings:
   # Los operadores tienen hogares ilimitados.
   op-unlimited: true
 
-  # Límite aplicado cuando el jugador no tiene
-  # ninguno de los permisos de límite específicos.
+  # Límite para jugadores sin un permiso de límite específico.
   default-limit: 3
 
+  # Tiempo de espera antes de teletransportarse, en segundos.
+  # 0 = teletransporte inmediato.
   teleport-delay: 3
+
+  # Cancelar el teletransporte si el jugador se mueve.
+  # Valor predeterminado: true.
+  teleport-cancel-on-move: true
+
+  # Cancelar el teletransporte si el jugador recibe daño.
+  # Valor predeterminado: true.
+  teleport-cancel-on-damage: true
+
+# Mundos donde se permite crear hogares.
+# Una lista vacía permite todos los mundos.
+allowed-worlds: []
 
 # Permisos de LuckPerms y cantidad de hogares.
 home-limits:
@@ -16,3 +29,4 @@ home-limits:
   simplehomes.limit.5: 5
   simplehomes.limit.7: 7
   simplehomes.limit.10: 10
+

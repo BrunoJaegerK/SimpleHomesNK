@@ -1,0 +1,101 @@
+
+# ==========================================
+# SimpleHomesNK - Idioma
+# Los colores se pueden escribir con &
+# Variables disponibles: {home}, {seconds},
+# {current}, {limit}, {old_home}, {new_home}
+# ==========================================
+
+general:
+  player-only: "&cEste comando solo puede ejecutarse dentro del juego."
+  database-error: "&cOcurrió un error al procesar tu solicitud. Inténtalo de nuevo."
+
+commands:
+  sethome:
+    usage: "&cUso correcto: /sethome [nombre]"
+    world-not-allowed: "&cNo puedes crear hogares en este mundo."
+    already-exists: "&cYa tienes un hogar con ese nombre."
+    limit-reached: "&cHas alcanzado tu límite de hogares &e({current}/{limit})&c."
+    limit-hint: "&7Elimina un hogar con &e/delhome [nombre] &7para liberar espacio."
+    success: "&aHogar &e{home} &aguardado correctamente."
+    save-error: "&cNo se pudo guardar el hogar. Inténtalo de nuevo."
+
+  home:
+    usage: "&cUso correcto: /home [nombre]"
+    not-found: "&cNo tienes un hogar llamado &e{home}&c."
+    world-unavailable: "&cEl mundo de ese hogar no está disponible."
+    lookup-error: "&cNo se pudo consultar tu hogar. Inténtalo de nuevo."
+
+  delhome:
+    usage: "&cUso correcto: /delhome <nombre>"
+    success: "&aEl hogar &e{home} &ase ha eliminado correctamente."
+    not-found: "&cNo tienes ningún hogar llamado &e{home}&c."
+    delete-error: "&cNo se pudo eliminar el hogar. Inténtalo de nuevo."
+
+validation:
+  database-null: "DatabaseManager no puede ser null."
+  player-uuid-null: "El UUID del jugador no puede ser null."
+  world-empty: "El nombre del mundo no puede estar vacío."
+  home-empty: "El nombre del hogar no puede estar vacío."
+  home-too-long: "El nombre del hogar no puede superar 32 caracteres."
+  home-invalid-characters: "El nombre solo puede contener letras, números, guiones y guiones bajos."
+  home-already-exists: "Ya tienes un hogar con ese nombre."
+
+teleport:
+  already-pending: "&cYa tienes un teletransporte pendiente."
+  world-unavailable: "&cEl mundo de destino no está disponible."
+  countdown-start: "&aTeletransporte en &e{seconds} &asegundos. No te muevas."
+  countdown-tick: "&aTeletransporte en &e{seconds} &asegundos..."
+  cancelled-move: "&cTeletransporte cancelado: te has movido."
+  cancelled-damage: "&cTeletransporte cancelado: has recibido daño."
+  world-unavailable-later: "&cEl mundo de destino ya no está disponible."
+  safe-location-not-found: "&cNo se encontró una ubicación segura cerca de esta casa."
+  safe-location-hint: "&7Intenta establecer la casa en otro lugar."
+  success: "&aTe has teletransportado a &e{home}&a."
+  failed: "&cNo se pudo completar el teletransporte."
+
+menus:
+  homes:
+    title: "&l&6Mis hogares"
+    empty: "&7Todavía no tienes hogares guardados.\n\n&fUsa &e/sethome [nombre] &fpara crear uno."
+    select-home: "&7Selecciona un hogar para ver sus opciones."
+    count: "\n\n&fHogares guardados: &e{current}&f/&e{limit}"
+    unlimited: "Ilimitados"
+    home-button: "&e🏠 {home}"
+    close: "&cCerrar"
+    closed: "&7Has cerrado el menú de hogares."
+
+  actions:
+    title: "&l&6Hogar: {home}"
+    content: "&7¿Qué deseas hacer con este hogar?"
+    teleport: "&aTeletransportarme"
+    rename: "&eCambiar nombre"
+    delete: "&cEliminar hogar"
+    back: "&cVolver"
+    reload-error: "&cNo se pudo cargar el menú de hogares."
+
+  rename:
+    title: "&l&6Cambiar nombre"
+    input-label: "Nuevo nombre"
+    input-placeholder: "Escribe el nuevo nombre"
+    empty: "&cEl nombre del hogar no puede estar vacío."
+    invalid: "&cUsa un nombre de hasta 32 caracteres: letras, números, guion o guion bajo."
+    unchanged: "&eEl nombre del hogar no ha cambiado."
+    success: "&aHogar renombrado correctamente: &e{old_home} &7→ &e{new_home}"
+    failed: "&cNo se pudo renombrar el hogar. Comprueba que todavía exista."
+    error: "&cOcurrió un error al renombrar el hogar."
+
+  delete:
+    title: "&l&cEliminar hogar"
+    confirmation: "&7¿Estás seguro de que deseas eliminar el hogar?\n\n&fNombre: &e{home}\n\n&cEsta acción no se puede deshacer."
+    confirm: "&cSí, eliminar"
+    success: "&aEl hogar &e{home} &ase ha eliminado correctamente."
+    missing: "&cEl hogar &e{home} &cya no existe."
+    error: "&cNo se pudo eliminar el hogar. Inténtalo de nuevo."
+    cancel: "&aCancelar"
+
+errors:
+  home-missing: "&cEse hogar ya no existe."
+  teleport-unavailable: "&cEl sistema de teletransporte no está disponible."
+  home-query-error: "&cNo se pudo consultar ese hogar."
+  home-list-error: "&cNo se pudieron cargar tus hogares. Inténtalo de nuevo."

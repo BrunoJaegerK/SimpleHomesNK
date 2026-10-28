@@ -6,6 +6,8 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.utils.Config;
+import cn.nukkit.utils.TextFormat;
 
 import com.formconstructor.FormConstructor;
 import com.formconstructor.form.SimpleForm;
@@ -18,6 +20,7 @@ import com.brunojaegerk.simplehomes.commands.DelHomeCommand;
 import com.brunojaegerk.simplehomes.homes.Home;
 import com.brunojaegerk.simplehomes.homes.HomeManager;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +30,7 @@ public class SimpleHomes extends PluginBase {
     private DatabaseManager databaseManager;
     private HomeManager homeManager;
     private HomeTeleportManager homeTeleportManager;
+    private Config lang;
 
     @Override
     public void onEnable() {
@@ -44,6 +48,7 @@ public class SimpleHomes extends PluginBase {
 
         try {
             saveDefaultConfig();
+            loadLang();
 
             databaseManager = new DatabaseManager(getDataFolder());
             databaseManager.connect();
@@ -62,6 +67,7 @@ public class SimpleHomes extends PluginBase {
             );
 
             homeManager = new HomeManager(
+                    this,
                     databaseManager,
                     homeLimits,
                     defaultLimit,
@@ -73,9 +79,21 @@ public class SimpleHomes extends PluginBase {
                     3
             );
 
+            boolean cancelOnMove = getConfig().getBoolean(
+                    "settings.teleport-cancel-on-move",
+                    true
+            );
+
+            boolean cancelOnDamage = getConfig().getBoolean(
+                    "settings.teleport-cancel-on-damage",
+                    true
+            );
+
             homeTeleportManager = new HomeTeleportManager(
                     this,
-                    teleportDelay
+                    teleportDelay,
+                    cancelOnMove,
+                    cancelOnDamage
             );
 
             getServer().getPluginManager().registerEvents(
@@ -158,7 +176,7 @@ public class SimpleHomes extends PluginBase {
 
         if (!(sender instanceof Player)) {
             sender.sendMessage(
-                    "Este comando solo puede ejecutarse dentro del juego."
+                    getMessage("general.player-only")
             );
             return true;
         }
@@ -179,7 +197,7 @@ public class SimpleHomes extends PluginBase {
             );
 
             player.sendMessage(
-                    "§cNo se pudieron cargar tus hogares. Inténtalo de nuevo."
+                    getMessage("errors.home-list-error")
             );
         }
 
@@ -190,23 +208,25 @@ public class SimpleHomes extends PluginBase {
         int limit = homeManager.getHomeLimit(player);
 
         String limitText = limit == Integer.MAX_VALUE
-                ? "Ilimitados"
+                ? getMessage("menus.homes.unlimited")
                 : String.valueOf(limit);
 
         String content;
 
         if (homes.isEmpty()) {
-            content = "§7Todavía no tienes hogares guardados.\n\n"
-                    + "§fUsa §e/sethome [nombre] §fpara crear uno.";
+            content = getMessage("menus.homes.empty");
         } else {
-            content = "§7Selecciona un hogar para ver sus opciones.";
+            content = getMessage("menus.homes.select-home");
         }
 
-        content += "\n\n§fHogares guardados: §e"
-                + homes.size() + "§f/§e" + limitText;
+        content += getMessage(
+                "menus.homes.count",
+                "current", String.valueOf(homes.size()),
+                "limit", limitText
+        );
 
         SimpleForm form = new SimpleForm(
-                "§l§6Mis hogares",
+                getMessage("menus.homes.title"),
                 content
         );
 
@@ -214,7 +234,10 @@ public class SimpleHomes extends PluginBase {
             String homeName = home.getName();
 
             form.addButton(
-                    "§e🏠 " + homeName,
+                    getMessage(
+                            "menus.homes.home-button",
+                            "home", homeName
+                    ),
                     (formPlayer, button) ->
                             openHomeActions(
                                     (Player) formPlayer,
@@ -223,10 +246,12 @@ public class SimpleHomes extends PluginBase {
             );
         }
 
-        form.addButton("§cCerrar", (formPlayer, button) ->
-                formPlayer.sendMessage(
-                        "§7Has cerrado el menú de hogares."
-                )
+        form.addButton(
+                getMessage("menus.homes.close"),
+                (formPlayer, button) ->
+                        formPlayer.sendMessage(
+                                getMessage("menus.homes.closed")
+                        )
         );
 
         FormConstructor.getInstance()
@@ -236,37 +261,53 @@ public class SimpleHomes extends PluginBase {
 
     private void openHomeActions(Player player, String homeName) {
         SimpleForm form = new SimpleForm(
-                "§l§6Hogar: " + homeName,
-                "§7¿Qué deseas hacer con este hogar?"
+                getMessage(
+                        "menus.actions.title",
+                        "home", homeName
+                ),
+                getMessage("menus.actions.content")
         );
 
-        form.addButton("§aTeletransportarme", (formPlayer, button) ->
-                teleportToHome((Player) formPlayer, homeName)
+        form.addButton(
+                getMessage("menus.actions.teleport"),
+                (formPlayer, button) ->
+                        teleportToHome((Player) formPlayer, homeName)
         );
 
-        form.addButton("§eCambiar nombre", (formPlayer, button) ->
-                openRenameHomeForm((Player) formPlayer, homeName)
+        form.addButton(
+                getMessage("menus.actions.rename"),
+                (formPlayer, button) ->
+                        openRenameHomeForm((Player) formPlayer, homeName)
         );
 
-        form.addButton("§cVolver", (formPlayer, button) -> {
-            Player target = (Player) formPlayer;
+        form.addButton(
+                getMessage("menus.actions.delete"),
+                (formPlayer, button) ->
+                        openDeleteHomeConfirmation((Player) formPlayer, homeName)
+        );
 
-            try {
-                openHomesMenu(
-                        target,
-                        homeManager.getHomes(target.getUniqueId())
-                );
-            } catch (SQLException exception) {
-                getLogger().error(
-                        "Error al volver al menú de hogares: "
-                                + exception.getMessage()
-                );
+        form.addButton(
+                getMessage("menus.actions.back"),
+                (formPlayer, button) -> {
+                    Player target = (Player) formPlayer;
 
-                target.sendMessage(
-                        "§cNo se pudo cargar el menú de hogares."
-                );
-            }
-        });
+                    try {
+                        openHomesMenu(
+                                target,
+                                homeManager.getHomes(target.getUniqueId())
+                        );
+                    } catch (SQLException exception) {
+                        getLogger().error(
+                                "Error al volver al menú de hogares: "
+                                        + exception.getMessage()
+                        );
+
+                        target.sendMessage(
+                                getMessage("menus.actions.reload-error")
+                        );
+                    }
+                }
+        );
 
         FormConstructor.getInstance()
                 .getFormService()
@@ -274,13 +315,15 @@ public class SimpleHomes extends PluginBase {
     }
 
     private void openRenameHomeForm(Player player, String oldName) {
-        CustomForm form = new CustomForm("§l§6Cambiar nombre");
+        CustomForm form = new CustomForm(
+                getMessage("menus.rename.title")
+        );
 
         form.addElement(
                 "newName",
                 new Input(
-                        "Nuevo nombre",
-                        "Escribe el nuevo nombre",
+                        getMessage("menus.rename.input-label"),
+                        getMessage("menus.rename.input-placeholder"),
                         oldName
                 )
         );
@@ -291,7 +334,7 @@ public class SimpleHomes extends PluginBase {
 
             if (newName == null || newName.trim().isEmpty()) {
                 target.sendMessage(
-                        "§cEl nombre del hogar no puede estar vacío."
+                        getMessage("menus.rename.empty")
                 );
                 return;
             }
@@ -301,15 +344,14 @@ public class SimpleHomes extends PluginBase {
             if (newName.length() > 32
                     || !newName.matches("[a-zA-Z0-9_-]+")) {
                 target.sendMessage(
-                        "§cUsa un nombre de hasta 32 caracteres: "
-                                + "letras, números, guion o guion bajo."
+                        getMessage("menus.rename.invalid")
                 );
                 return;
             }
 
             if (oldName.equals(newName)) {
                 target.sendMessage(
-                        "§eEl nombre del hogar no ha cambiado."
+                        getMessage("menus.rename.unchanged")
                 );
                 return;
             }
@@ -323,15 +365,17 @@ public class SimpleHomes extends PluginBase {
 
                 if (!renamed) {
                     target.sendMessage(
-                            "§cNo se pudo renombrar el hogar. "
-                                    + "Comprueba que todavía exista."
+                            getMessage("menus.rename.failed")
                     );
                     return;
                 }
 
                 target.sendMessage(
-                        "§aHogar renombrado correctamente: §e"
-                                + oldName + " §7→ §e" + newName
+                        getMessage(
+                                "menus.rename.success",
+                                "old_home", oldName,
+                                "new_home", newName
+                        )
                 );
 
                 openHomesMenu(
@@ -341,7 +385,10 @@ public class SimpleHomes extends PluginBase {
 
             } catch (IllegalArgumentException exception) {
                 target.sendMessage(
-                        "§c" + exception.getMessage()
+                        TextFormat.colorize(
+                                '&',
+                                "&c" + exception.getMessage()
+                        )
                 );
 
             } catch (SQLException exception) {
@@ -351,10 +398,78 @@ public class SimpleHomes extends PluginBase {
                 );
 
                 target.sendMessage(
-                        "§cOcurrió un error al renombrar el hogar."
+                        getMessage("menus.rename.error")
                 );
             }
         });
+
+        FormConstructor.getInstance()
+                .getFormService()
+                .sendForm(player, form);
+    }
+
+    private void openDeleteHomeConfirmation(
+            Player player,
+            String homeName
+    ) {
+        SimpleForm form = new SimpleForm(
+                getMessage("menus.delete.title"),
+                getMessage(
+                        "menus.delete.confirmation",
+                        "home", homeName
+                )
+        );
+
+        form.addButton(
+                getMessage("menus.delete.confirm"),
+                (formPlayer, button) -> {
+                    Player target = (Player) formPlayer;
+
+                    try {
+                        boolean deleted = homeManager.deleteHome(
+                                target.getUniqueId(),
+                                homeName
+                        );
+
+                        if (deleted) {
+                            target.sendMessage(
+                                    getMessage(
+                                            "menus.delete.success",
+                                            "home", homeName
+                                    )
+                            );
+                        } else {
+                            target.sendMessage(
+                                    getMessage(
+                                            "menus.delete.missing",
+                                            "home", homeName
+                                    )
+                            );
+                        }
+
+                        openHomesMenu(
+                                target,
+                                homeManager.getHomes(target.getUniqueId())
+                        );
+
+                    } catch (SQLException exception) {
+                        getLogger().error(
+                                "Error SQLite al eliminar el hogar desde el menú: "
+                                        + exception.getMessage()
+                        );
+
+                        target.sendMessage(
+                                getMessage("menus.delete.error")
+                        );
+                    }
+                }
+        );
+
+        form.addButton(
+                getMessage("menus.delete.cancel"),
+                (formPlayer, button) ->
+                        openHomeActions((Player) formPlayer, homeName)
+        );
 
         FormConstructor.getInstance()
                 .getFormService()
@@ -370,7 +485,7 @@ public class SimpleHomes extends PluginBase {
 
             if (home == null) {
                 player.sendMessage(
-                        "§cEse hogar ya no existe."
+                        getMessage("errors.home-missing")
                 );
                 return;
             }
@@ -381,7 +496,7 @@ public class SimpleHomes extends PluginBase {
 
             if (level == null) {
                 player.sendMessage(
-                        "§cEl mundo de ese hogar no está disponible."
+                        getMessage("commands.home.world-unavailable")
                 );
                 return;
             }
@@ -397,7 +512,7 @@ public class SimpleHomes extends PluginBase {
 
             if (homeTeleportManager == null) {
                 player.sendMessage(
-                        "§cEl sistema de teletransporte no está disponible."
+                        getMessage("errors.teleport-unavailable")
                 );
                 return;
             }
@@ -415,9 +530,65 @@ public class SimpleHomes extends PluginBase {
             );
 
             player.sendMessage(
-                    "§cNo se pudo consultar ese hogar."
+                    getMessage("errors.home-query-error")
             );
         }
     }
+
+    private void loadLang() {
+        saveResource("lang.yml", false);
+
+        lang = new Config(
+                new File(getDataFolder(), "lang.yml"),
+                Config.YAML
+        );
+    }
+
+    public String getMessage(String key) {
+        if (lang == null) {
+            return "§cMensaje no disponible: " + key;
+        }
+
+        String message = lang.getString(key);
+
+        if (message == null) {
+            getLogger().warning(
+                    "No se encontró la clave de idioma: " + key
+            );
+            return "§cMensaje no disponible: " + key;
+        }
+
+        return TextFormat.colorize('&', message);
+    }
+
+    public String getMessage(
+            String key,
+            String... replacements
+    ) {
+        String message = getMessage(key);
+
+        if (replacements == null) {
+            return message;
+        }
+
+        if (replacements.length % 2 != 0) {
+            getLogger().warning(
+                    "Reemplazos incompletos para la clave: " + key
+            );
+            return message;
+        }
+
+        for (int i = 0; i < replacements.length; i += 2) {
+            String placeholder = "{" + replacements[i] + "}";
+            String value = replacements[i + 1] == null
+                    ? ""
+                    : replacements[i + 1];
+
+            message = message.replace(placeholder, value);
+        }
+
+        return message;
+    }
 }
+
 

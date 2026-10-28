@@ -20,13 +20,22 @@ public class HomeTeleportManager implements Listener {
 
     private final SimpleHomes plugin;
     private final int delaySeconds;
+    private final boolean cancelOnMove;
+    private final boolean cancelOnDamage;
 
     private final Map<UUID, PendingTeleport> pendingTeleports =
             new HashMap<>();
 
-    public HomeTeleportManager(SimpleHomes plugin, int delaySeconds) {
+    public HomeTeleportManager(
+            SimpleHomes plugin,
+            int delaySeconds,
+            boolean cancelOnMove,
+            boolean cancelOnDamage
+    ) {
         this.plugin = plugin;
         this.delaySeconds = Math.max(0, delaySeconds);
+        this.cancelOnMove = cancelOnMove;
+        this.cancelOnDamage = cancelOnDamage;
     }
 
     public void teleport(Player player, Location destination, String homeName) {
@@ -37,12 +46,16 @@ public class HomeTeleportManager implements Listener {
         UUID uuid = player.getUniqueId();
 
         if (pendingTeleports.containsKey(uuid)) {
-            player.sendMessage("§cYa tienes un teletransporte pendiente.");
+            player.sendMessage(
+                    plugin.getMessage("teleport.already-pending")
+            );
             return;
         }
 
         if (destination.getLevel() == null) {
-            player.sendMessage("§cEl mundo de destino no está disponible.");
+            player.sendMessage(
+                    plugin.getMessage("teleport.world-unavailable")
+            );
             return;
         }
 
@@ -60,8 +73,11 @@ public class HomeTeleportManager implements Listener {
         pendingTeleports.put(uuid, pending);
 
         player.sendMessage(
-                "§aTeletransporte en §e" + delaySeconds
-                        + " §asegundos. No te muevas."
+                plugin.getMessage(
+                        "teleport.countdown-start",
+                        "seconds",
+                        String.valueOf(delaySeconds)
+                )
         );
 
         pending.taskHandler = plugin.getServer()
@@ -98,9 +114,13 @@ public class HomeTeleportManager implements Listener {
                             );
                         } else {
                             player.sendMessage(
-                                    "§aTeletransporte en §e"
-                                            + pending.remainingSeconds
-                                            + " §asegundos..."
+                                    plugin.getMessage(
+                                            "teleport.countdown-tick",
+                                            "seconds",
+                                            String.valueOf(
+                                                    pending.remainingSeconds
+                                            )
+                                    )
                             );
                         }
                     }
@@ -110,6 +130,10 @@ public class HomeTeleportManager implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
+
+        if (!cancelOnMove) {
+            return;
+        }
 
         if (!pendingTeleports.containsKey(player.getUniqueId())) {
             return;
@@ -128,7 +152,7 @@ public class HomeTeleportManager implements Listener {
                 || Math.abs(dz) > 0.01) {
             cancelTeleport(
                     player,
-                    "§cTeletransporte cancelado: te has movido."
+                    plugin.getMessage("teleport.cancelled-move")
             );
         }
     }
@@ -136,6 +160,10 @@ public class HomeTeleportManager implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+
+        if (!cancelOnDamage) {
             return;
         }
 
@@ -148,7 +176,7 @@ public class HomeTeleportManager implements Listener {
         if (pendingTeleports.containsKey(player.getUniqueId())) {
             cancelTeleport(
                     player,
-                    "§cTeletransporte cancelado: has recibido daño."
+                    plugin.getMessage("teleport.cancelled-damage")
             );
         }
     }
@@ -193,7 +221,7 @@ public class HomeTeleportManager implements Listener {
 
         if (level == null) {
             player.sendMessage(
-                    "§cEl mundo de destino ya no está disponible."
+                    plugin.getMessage("teleport.world-unavailable-later")
             );
             return;
         }
@@ -202,22 +230,25 @@ public class HomeTeleportManager implements Listener {
 
         if (safeLocation == null) {
             player.sendMessage(
-                    "§cNo se encontró una ubicación segura cerca de esta casa."
+                    plugin.getMessage("teleport.safe-location-not-found")
             );
             player.sendMessage(
-                    "§7Intenta establecer la casa en otro lugar."
+                    plugin.getMessage("teleport.safe-location-hint")
             );
             return;
         }
 
         if (player.teleport(safeLocation)) {
             player.sendMessage(
-                    "§aTe has teletransportado a §e"
-                            + homeName + "§a."
+                    plugin.getMessage(
+                            "teleport.success",
+                            "home",
+                            homeName
+                    )
             );
         } else {
             player.sendMessage(
-                    "§cNo se pudo completar el teletransporte."
+                    plugin.getMessage("teleport.failed")
             );
         }
     }
@@ -359,3 +390,4 @@ public class HomeTeleportManager implements Listener {
         }
     }
 }
+

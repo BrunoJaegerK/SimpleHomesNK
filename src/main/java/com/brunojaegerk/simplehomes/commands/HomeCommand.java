@@ -38,7 +38,7 @@ public class HomeCommand extends Command {
     ) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(
-                    "Este comando solo puede ejecutarse dentro del juego."
+                    plugin.getMessage("general.player-only")
             );
             return true;
         }
@@ -50,7 +50,9 @@ public class HomeCommand extends Command {
         }
 
         if (args.length > 1) {
-            player.sendMessage("§cUso correcto: /home [nombre]");
+            player.sendMessage(
+                    plugin.getMessage("commands.home.usage")
+            );
             return true;
         }
 
@@ -64,8 +66,10 @@ public class HomeCommand extends Command {
 
             if (home == null) {
                 player.sendMessage(
-                        "§cNo tienes un hogar llamado §e"
-                                + homeName + "§c."
+                        plugin.getMessage(
+                                "commands.home.not-found",
+                                "home", homeName
+                        )
                 );
                 return true;
             }
@@ -76,7 +80,9 @@ public class HomeCommand extends Command {
 
             if (level == null) {
                 player.sendMessage(
-                        "§cEl mundo de ese hogar no está disponible."
+                        plugin.getMessage(
+                                "commands.home.world-unavailable"
+                        )
                 );
                 return true;
             }
@@ -89,6 +95,13 @@ public class HomeCommand extends Command {
                     home.getPitch(),
                     level
             );
+
+            if (plugin.getTeleportManager() == null) {
+                player.sendMessage(
+                        plugin.getMessage("errors.teleport-unavailable")
+                );
+                return true;
+            }
 
             plugin.getTeleportManager().teleport(
                     player,
@@ -106,11 +119,12 @@ public class HomeCommand extends Command {
             );
 
             player.sendMessage(
-                    "§cNo se pudo consultar tu hogar. Inténtalo de nuevo."
+                    plugin.getMessage("commands.home.lookup-error")
             );
         }
 
         return true;
     }
 }
+
 

@@ -35,7 +35,7 @@ public class DelHomeCommand extends Command {
     ) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(
-                    "Este comando solo puede ejecutarse dentro del juego."
+                    plugin.getMessage("general.player-only")
             );
             return true;
         }
@@ -47,7 +47,9 @@ public class DelHomeCommand extends Command {
         }
 
         if (args.length != 1) {
-            player.sendMessage("§cUso correcto: /delhome <nombre>");
+            player.sendMessage(
+                    plugin.getMessage("commands.delhome.usage")
+            );
             return true;
         }
 
@@ -61,13 +63,17 @@ public class DelHomeCommand extends Command {
 
             if (deleted) {
                 player.sendMessage(
-                        "§aEl hogar §e" + homeName
-                                + " §ase ha eliminado correctamente."
+                        plugin.getMessage(
+                                "commands.delhome.success",
+                                "home", homeName
+                        )
                 );
             } else {
                 player.sendMessage(
-                        "§cNo tienes ningún hogar llamado §e"
-                                + homeName + "§c."
+                        plugin.getMessage(
+                                "commands.delhome.not-found",
+                                "home", homeName
+                        )
                 );
             }
 
@@ -81,11 +87,12 @@ public class DelHomeCommand extends Command {
             );
 
             player.sendMessage(
-                    "§cNo se pudo eliminar el hogar. Inténtalo de nuevo."
+                    plugin.getMessage("commands.delhome.delete-error")
             );
         }
 
         return true;
     }
 }
+
 

@@ -1,4 +1,3 @@
-
 package com.brunojaegerk.simplehomes.commands;
 
 import cn.nukkit.Player;
@@ -40,7 +39,7 @@ public class SetHomeCommand extends Command {
     ) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(
-                    "Este comando solo puede ejecutarse dentro del juego."
+                    plugin.getMessage("general.player-only")
             );
             return true;
         }
@@ -54,7 +53,9 @@ public class SetHomeCommand extends Command {
         String homeName = args.length == 0 ? "casa" : args[0];
 
         if (args.length > 1) {
-            player.sendMessage("§cUso correcto: /sethome [nombre]");
+            player.sendMessage(
+                    plugin.getMessage("commands.sethome.usage")
+            );
             return true;
         }
 
@@ -66,7 +67,9 @@ public class SetHomeCommand extends Command {
                     homeName
             )) {
                 player.sendMessage(
-                        "§cYa tienes un hogar con ese nombre."
+                        plugin.getMessage(
+                                "commands.sethome.already-exists"
+                        )
                 );
                 return true;
             }
@@ -76,15 +79,17 @@ public class SetHomeCommand extends Command {
                     player.getUniqueId()
             );
 
-            if (limit != Integer.MAX_VALUE
-                    && currentHomes >= limit) {
+            if (limit != Integer.MAX_VALUE && currentHomes >= limit) {
                 player.sendMessage(
-                        "§cHas alcanzado tu límite de hogares "
-                                + "§e(" + currentHomes + "/" + limit + ")§c."
+                        plugin.getMessage(
+                                "commands.sethome.limit-reached",
+                                "current", String.valueOf(currentHomes),
+                                "limit", String.valueOf(limit)
+                        )
                 );
+
                 player.sendMessage(
-                        "§7Elimina un hogar con §e/delhome [nombre] "
-                                + "§7para liberar espacio."
+                        plugin.getMessage("commands.sethome.limit-hint")
                 );
                 return true;
             }
@@ -104,17 +109,23 @@ public class SetHomeCommand extends Command {
 
             if (created) {
                 player.sendMessage(
-                        "§aHogar §e" + homeName
-                                + " §aguardado correctamente."
+                        plugin.getMessage(
+                                "commands.sethome.success",
+                                "home", homeName
+                        )
                 );
             } else {
                 player.sendMessage(
-                        "§cYa tienes un hogar con ese nombre."
+                        plugin.getMessage(
+                                "commands.sethome.already-exists"
+                        )
                 );
             }
 
         } catch (IllegalArgumentException exception) {
-            player.sendMessage("§c" + exception.getMessage());
+            player.sendMessage(
+                    "§c" + exception.getMessage()
+            );
 
         } catch (SQLException exception) {
             plugin.getLogger().error(
@@ -123,12 +134,11 @@ public class SetHomeCommand extends Command {
             );
 
             player.sendMessage(
-                    "§cNo se pudo guardar el hogar. Inténtalo de nuevo."
+                    plugin.getMessage("commands.sethome.save-error")
             );
         }
 
         return true;
     }
 }
-
 

@@ -3,6 +3,7 @@ package com.brunojaegerk.simplehomes.homes;
 import cn.nukkit.Player;
 
 import com.brunojaegerk.simplehomes.DatabaseManager;
+import com.brunojaegerk.simplehomes.SimpleHomes;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -12,11 +13,13 @@ import java.util.UUID;
 public class HomeManager {
 
     private final DatabaseManager databaseManager;
+    private final SimpleHomes plugin;
     private final Map<String, Object> homeLimits;
     private final int defaultLimit;
     private final boolean opUnlimited;
 
     public HomeManager(
+            SimpleHomes plugin,
             DatabaseManager databaseManager,
             Map<String, Object> homeLimits,
             int defaultLimit,
@@ -24,10 +27,11 @@ public class HomeManager {
     ) {
         if (databaseManager == null) {
             throw new IllegalArgumentException(
-                    "DatabaseManager no puede ser null."
+                    plugin.getMessage("validation.database-null")
             );
         }
 
+        this.plugin = plugin;
         this.databaseManager = databaseManager;
         this.homeLimits = homeLimits;
         this.defaultLimit = Math.max(0, defaultLimit);
@@ -92,16 +96,11 @@ public class HomeManager {
     ) throws SQLException {
 
         validateHomeName(homeName);
-
-        if (playerUUID == null) {
-            throw new IllegalArgumentException(
-                    "El UUID del jugador no puede ser null."
-            );
-        }
+        validatePlayer(playerUUID);
 
         if (worldName == null || worldName.isBlank()) {
             throw new IllegalArgumentException(
-                    "El nombre del mundo no puede estar vacío."
+                    plugin.getMessage("validation.world-empty")
             );
         }
 
@@ -161,7 +160,7 @@ public class HomeManager {
         if (!oldName.equalsIgnoreCase(newName)
                 && databaseManager.homeExists(playerUUID, newName)) {
             throw new IllegalArgumentException(
-                    "Ya tienes un hogar con ese nombre."
+                    plugin.getMessage("validation.home-already-exists")
             );
         }
 
@@ -184,7 +183,7 @@ public class HomeManager {
     private void validatePlayer(UUID playerUUID) {
         if (playerUUID == null) {
             throw new IllegalArgumentException(
-                    "El UUID del jugador no puede ser null."
+                    plugin.getMessage("validation.player-uuid-null")
             );
         }
     }
@@ -192,23 +191,23 @@ public class HomeManager {
     private void validateHomeName(String homeName) {
         if (homeName == null || homeName.isBlank()) {
             throw new IllegalArgumentException(
-                    "El nombre del hogar no puede estar vacío."
+                    plugin.getMessage("validation.home-empty")
             );
         }
 
         if (homeName.length() > 32) {
             throw new IllegalArgumentException(
-                    "El nombre del hogar no puede superar 32 caracteres."
+                    plugin.getMessage("validation.home-too-long")
             );
         }
 
         if (!homeName.matches("[a-zA-Z0-9_-]+")) {
             throw new IllegalArgumentException(
-                    "El nombre solo puede contener letras, números, "
-                            + "guiones y guiones bajos."
+                    plugin.getMessage("validation.home-invalid-characters")
             );
         }
     }
 }
+
 
 
