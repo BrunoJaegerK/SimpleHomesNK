@@ -254,9 +254,10 @@ Al reportar un error, incluye la versión del servidor, la versión del plugin, 
 
 ## 📜 Licencia
 
-Consulta la licencia publicada en el repositorio para conocer las condiciones de uso, modificación y distribución del proyecto.
+Este proyecto está protegido bajo la
+[Apache License 2.0](LICENSE).
 
-Si el repositorio todavía no contiene un archivo de licencia, no se debe asumir que el proyecto está publicado bajo una licencia de código abierto específica.
+Copyright © 2026 Bruno JaegerK.
 
 ---
 
