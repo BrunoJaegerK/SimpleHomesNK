@@ -1,10 +1,10 @@
 package com.brunojaegerk.simplehomes.commands;
 
-import cn.nukkit.Player;
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Location;
+import org.powernukkitx.Player;
+import org.powernukkitx.command.Command;
+import org.powernukkitx.command.CommandSender;
+import org.powernukkitx.level.Level;
+import org.powernukkitx.level.Location;
 
 import com.brunojaegerk.simplehomes.SimpleHomes;
 import com.brunojaegerk.simplehomes.homes.Home;

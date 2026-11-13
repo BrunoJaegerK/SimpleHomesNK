@@ -1,8 +1,8 @@
 package com.brunojaegerk.simplehomes.commands;
 
-import cn.nukkit.Player;
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
+import org.powernukkitx.Player;
+import org.powernukkitx.command.Command;
+import org.powernukkitx.command.CommandSender;
 
 import com.brunojaegerk.simplehomes.SimpleHomes;
 import com.brunojaegerk.simplehomes.homes.HomeManager;

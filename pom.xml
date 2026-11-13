@@ -2,12 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.brunojaegerk</groupId>
-    <artifactId>simplehomes</artifactId>
-    <version>1.0.0</version>
+    <artifactId>simplehomes-pnx</artifactId>
+    <version>1.0.0-pnx-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -15,26 +14,31 @@
         <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>powernukkitx</id>
+            <url>https://repo.powernukkitx.org/releases</url>
+        </repository>
+        <repository>
+            <id>opencollab-releases</id>
+            <url>https://repo.opencollab.dev/maven-releases/</url>
+        </repository>
+        <repository>
+            <id>opencollab-snapshots</id>
+            <url>https://repo.opencollab.dev/maven-snapshots/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
-        <!-- NukkitPetteriM1Edition: solo para compilar -->
+        <!-- API beta del servidor; no se empaqueta dentro del plugin. -->
         <dependency>
-            <groupId>local.nukkit</groupId>
-            <artifactId>nukkit-pm1e</artifactId>
-            <version>local</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/server.jar</systemPath>
+            <groupId>org.powernukkitx</groupId>
+            <artifactId>server</artifactId>
+            <version>nightly-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
-        <!-- FormConstructor 3.1.0: solo para compilar -->
-        <dependency>
-            <groupId>local.formconstructor</groupId>
-            <artifactId>formconstructor</artifactId>
-            <version>3.1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/FormConstructor-3.1.0.jar</systemPath>
-        </dependency>
-
-        <!-- Controlador SQLite -->
+        <!-- SQLite se incluye en el JAR final. -->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
@@ -43,10 +47,8 @@
     </dependencies>
 
     <build>
-        <finalName>SimpleHomes-1.0.0</finalName>
-
+        <finalName>SimpleHomes-PNX</finalName>
         <plugins>
-            <!-- Compilación para Java 25 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -56,35 +58,26 @@
                 </configuration>
             </plugin>
 
-            <!-- Empaqueta SQLite dentro del JAR del plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.6.0</version>
-
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
-
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-
-                            <!-- Solo incluir SQLite; no sombrear Nukkit ni FormConstructor -->
                             <artifactSet>
                                 <includes>
                                     <include>org.xerial:sqlite-jdbc</include>
                                 </includes>
                             </artifactSet>
-
-                            <!-- Conserva los registros de servicios JDBC -->
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
-
-                            <!-- Elimina firmas que dejan de ser válidas al sombrear -->
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -101,5 +94,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

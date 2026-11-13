@@ -1,15 +1,15 @@
 package com.brunojaegerk.simplehomes;
 
-import cn.nukkit.Player;
-import cn.nukkit.block.Block;
-import cn.nukkit.event.EventHandler;
-import cn.nukkit.event.Listener;
-import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.player.PlayerMoveEvent;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Location;
-import cn.nukkit.scheduler.Task;
-import cn.nukkit.scheduler.TaskHandler;
+import org.powernukkitx.Player;
+import org.powernukkitx.block.Block;
+import org.powernukkitx.event.EventHandler;
+import org.powernukkitx.event.Listener;
+import org.powernukkitx.event.entity.EntityDamageEvent;
+import org.powernukkitx.event.player.PlayerMoveEvent;
+import org.powernukkitx.level.Level;
+import org.powernukkitx.level.Location;
+import org.powernukkitx.scheduler.Task;
+import org.powernukkitx.scheduler.TaskHandler;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -350,19 +350,19 @@ public class HomeTeleportManager implements Listener {
     }
 
     private boolean isDangerousBlock(Block block) {
-        int id = block.getId();
-
-        // IDs clásicos de agua, lava, fuego, cactus y magma.
-        if (id == 8 || id == 9
-                || id == 10 || id == 11
-                || id == 51 || id == 81
-                || id == 213) {
-            return true;
-        }
-
+        // PowerNukkitX usa identificadores namespaced (String), no IDs numéricos.
+        String id = block.getId().toLowerCase(Locale.ROOT);
         String name = block.getName().toLowerCase(Locale.ROOT);
 
-        return name.contains("lava")
+        return id.contains("water")
+                || id.contains("lava")
+                || id.contains("fire")
+                || id.contains("cactus")
+                || id.contains("magma")
+                || id.contains("campfire")
+                || id.contains("sweet_berry")
+                || id.contains("powder_snow")
+                || name.contains("lava")
                 || name.contains("fire")
                 || name.contains("cactus")
                 || name.contains("magma")

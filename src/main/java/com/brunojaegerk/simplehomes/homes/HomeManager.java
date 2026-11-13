@@ -1,6 +1,6 @@
 package com.brunojaegerk.simplehomes.homes;
 
-import cn.nukkit.Player;
+import org.powernukkitx.Player;
 
 import com.brunojaegerk.simplehomes.DatabaseManager;
 import com.brunojaegerk.simplehomes.SimpleHomes;

@@ -1,18 +1,16 @@
 package com.brunojaegerk.simplehomes;
 
-import cn.nukkit.Player;
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Location;
-import cn.nukkit.plugin.PluginBase;
-import cn.nukkit.utils.Config;
-import cn.nukkit.utils.TextFormat;
+import org.powernukkitx.Player;
+import org.powernukkitx.command.Command;
+import org.powernukkitx.command.CommandSender;
+import org.powernukkitx.level.Level;
+import org.powernukkitx.level.Location;
+import org.powernukkitx.plugin.PluginBase;
+import org.powernukkitx.utils.Config;
+import org.powernukkitx.utils.TextFormat;
 
-import com.formconstructor.FormConstructor;
-import com.formconstructor.form.SimpleForm;
-import com.formconstructor.form.CustomForm;
-import com.formconstructor.form.element.custom.Input;
+import org.powernukkitx.form.window.SimpleForm;
+import org.powernukkitx.form.window.CustomForm;
 
 import com.brunojaegerk.simplehomes.commands.SetHomeCommand;
 import com.brunojaegerk.simplehomes.commands.HomeCommand;
@@ -36,16 +34,6 @@ public class SimpleHomes extends PluginBase {
     public void onEnable() {
         getLogger().info("Iniciando SimpleHomes...");
 
-        if (FormConstructor.getInstance() == null) {
-            getLogger().error(
-                    "FormConstructor no está disponible. "
-                            + "Comprueba que esté instalado y habilitado."
-            );
-
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
         try {
             saveDefaultConfig();
             loadLang();
@@ -54,7 +42,7 @@ public class SimpleHomes extends PluginBase {
             databaseManager.connect();
 
             Map<String, Object> homeLimits =
-                    getConfig().getSection("home-limits").getAll();
+                    getConfig().getSection("home-limits").getAllMap();
 
             int defaultLimit = getConfig().getInt(
                     "settings.default-limit",
@@ -238,9 +226,9 @@ public class SimpleHomes extends PluginBase {
                             "menus.homes.home-button",
                             "home", homeName
                     ),
-                    (formPlayer, button) ->
+                    (formPlayer) ->
                             openHomeActions(
-                                    (Player) formPlayer,
+                                    formPlayer,
                                     homeName
                             )
             );
@@ -248,15 +236,13 @@ public class SimpleHomes extends PluginBase {
 
         form.addButton(
                 getMessage("menus.homes.close"),
-                (formPlayer, button) ->
+                (formPlayer) ->
                         formPlayer.sendMessage(
                                 getMessage("menus.homes.closed")
                         )
         );
 
-        FormConstructor.getInstance()
-                .getFormService()
-                .sendForm(player, form);
+        form.send(player);
     }
 
     private void openHomeActions(Player player, String homeName) {
@@ -270,26 +256,26 @@ public class SimpleHomes extends PluginBase {
 
         form.addButton(
                 getMessage("menus.actions.teleport"),
-                (formPlayer, button) ->
-                        teleportToHome((Player) formPlayer, homeName)
+                (formPlayer) ->
+                        teleportToHome(formPlayer, homeName)
         );
 
         form.addButton(
                 getMessage("menus.actions.rename"),
-                (formPlayer, button) ->
-                        openRenameHomeForm((Player) formPlayer, homeName)
+                (formPlayer) ->
+                        openRenameHomeForm(formPlayer, homeName)
         );
 
         form.addButton(
                 getMessage("menus.actions.delete"),
-                (formPlayer, button) ->
-                        openDeleteHomeConfirmation((Player) formPlayer, homeName)
+                (formPlayer) ->
+                        openDeleteHomeConfirmation(formPlayer, homeName)
         );
 
         form.addButton(
                 getMessage("menus.actions.back"),
-                (formPlayer, button) -> {
-                    Player target = (Player) formPlayer;
+                (formPlayer) -> {
+                    Player target = formPlayer;
 
                     try {
                         openHomesMenu(
@@ -309,9 +295,7 @@ public class SimpleHomes extends PluginBase {
                 }
         );
 
-        FormConstructor.getInstance()
-                .getFormService()
-                .sendForm(player, form);
+        form.send(player);
     }
 
     private void openRenameHomeForm(Player player, String oldName) {
@@ -319,18 +303,15 @@ public class SimpleHomes extends PluginBase {
                 getMessage("menus.rename.title")
         );
 
-        form.addElement(
-                "newName",
-                new Input(
-                        getMessage("menus.rename.input-label"),
-                        getMessage("menus.rename.input-placeholder"),
-                        oldName
-                )
+        form.addInput(
+                getMessage("menus.rename.input-label"),
+                getMessage("menus.rename.input-placeholder"),
+                oldName
         );
 
-        form.setHandler((formPlayer, response) -> {
+        form.onSubmit((formPlayer, response) -> {
             Player target = formPlayer;
-            String newName = response.getInput("newName").getValue();
+            String newName = response.getInputResponse(0);
 
             if (newName == null || newName.trim().isEmpty()) {
                 target.sendMessage(
@@ -403,9 +384,7 @@ public class SimpleHomes extends PluginBase {
             }
         });
 
-        FormConstructor.getInstance()
-                .getFormService()
-                .sendForm(player, form);
+        form.send(player);
     }
 
     private void openDeleteHomeConfirmation(
@@ -422,8 +401,8 @@ public class SimpleHomes extends PluginBase {
 
         form.addButton(
                 getMessage("menus.delete.confirm"),
-                (formPlayer, button) -> {
-                    Player target = (Player) formPlayer;
+                (formPlayer) -> {
+                    Player target = formPlayer;
 
                     try {
                         boolean deleted = homeManager.deleteHome(
@@ -467,13 +446,11 @@ public class SimpleHomes extends PluginBase {
 
         form.addButton(
                 getMessage("menus.delete.cancel"),
-                (formPlayer, button) ->
-                        openHomeActions((Player) formPlayer, homeName)
+                (formPlayer) ->
+                        openHomeActions(formPlayer, homeName)
         );
 
-        FormConstructor.getInstance()
-                .getFormService()
-                .sendForm(player, form);
+        form.send(player);
     }
 
     private void teleportToHome(Player player, String homeName) {

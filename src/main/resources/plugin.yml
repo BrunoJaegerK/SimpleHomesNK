@@ -1,11 +1,9 @@
 name: SimpleHomesNk
 main: com.brunojaegerk.simplehomes.SimpleHomes
-version: "1.0.0"
-api: ["1.0.13"]
+version: "1.0.0-pnx"
+api: ["2.0.0"]
 author: BrunoJaegerK
-description: Sistema de hogares para NukkitPetteriM1Edition
-depend:
-  - FormConstructor
+description: Sistema de hogares para PowerNukkitX beta con formularios nativos
 
 commands:
   homes:
@@ -22,6 +20,11 @@ permissions:
     default: true
   simplehomes.command.delhome:
     default: true
-  simplehomes.limit.1:
-    default: true
-
+  simplehomes.limit.3:
+    default: false
+  simplehomes.limit.5:
+    default: false
+  simplehomes.limit.7:
+    default: false
+  simplehomes.limit.10:
+    default: false

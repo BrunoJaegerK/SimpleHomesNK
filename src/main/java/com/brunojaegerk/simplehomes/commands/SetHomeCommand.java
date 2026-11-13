@@ -1,14 +1,15 @@
 package com.brunojaegerk.simplehomes.commands;
 
-import cn.nukkit.Player;
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
-import cn.nukkit.level.Position;
+import org.powernukkitx.Player;
+import org.powernukkitx.command.Command;
+import org.powernukkitx.command.CommandSender;
+import org.powernukkitx.level.Position;
 
 import com.brunojaegerk.simplehomes.homes.HomeManager;
 import com.brunojaegerk.simplehomes.SimpleHomes;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class SetHomeCommand extends Command {
 
@@ -60,6 +61,25 @@ public class SetHomeCommand extends Command {
         }
 
         try {
+            Object allowedWorldsValue = plugin.getConfig().get("allowed-worlds");
+            if (allowedWorldsValue instanceof List<?> allowedWorlds && !allowedWorlds.isEmpty()) {
+                String currentWorld = player.getLevel().getName();
+                boolean allowed = false;
+
+                for (Object entry : allowedWorlds) {
+                    if (entry instanceof String worldName
+                            && worldName.equalsIgnoreCase(currentWorld)) {
+                        allowed = true;
+                        break;
+                    }
+                }
+
+                if (!allowed) {
+                    player.sendMessage(plugin.getMessage("commands.sethome.world-not-allowed"));
+                    return true;
+                }
+            }
+
             // No permitir duplicados ni contar un hogar existente
             // como una nueva creación.
             if (homeManager.homeExists(
